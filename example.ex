@@ -20,29 +20,29 @@ defmodule Mailbox do
 
   @impl true
   def init(initial_state) do   # initiating the state with the value 1 passed
-    IO.inspect(Enum.join(["GenServer", "init"], " "))
+    IO.inspect({self(), "init"})
     {:ok,initial_state}
   end
 
   @impl true
   def handle_call({:send_mail, msg}, _from, state) do
-    IO.inspect(Enum.join(["GenServer", "handle_call start ...", msg], " "))
+    IO.inspect({self(), "handle_call", msg, "started"})
     :timer.sleep 2000
-    IO.inspect(Enum.join(["GenServer", "handle_call finish ...", msg], " "))
+    IO.inspect({self(), "handle_call", msg, "finished"})
     {:reply, msg, state ++ [msg]}
   end
 
   @impl true
   def handle_cast({:async_send_mail, msg}, state) do
-    IO.inspect(Enum.join(["GenServer", "handle_cast start ...", msg], " "))
+    IO.inspect({self(), "handle_cast", msg, "started"})
     :timer.sleep 5000
-    IO.inspect(Enum.join(["GenServer", "handle_cast finish ...", msg], " "))
+    IO.inspect({self(), "handle_cast", msg, "finished"})
     {:noreply, state ++ [msg]}
   end
 
   @impl true
   def handle_info(:info, state) do
-    IO.inspect(Enum.join(["GenServer", "handle_cast"], " "))
+    IO.inspect({self(), "handle_info"})
     {:noreply, state}
   end
 
@@ -53,10 +53,10 @@ defmodule Test do
   def test do
     {:ok, pid} = Mailbox.signup
     IO.puts("sending sync message to server...")
-    Mailbox.send_mail(pid, Enum.join(["Test", "says SYNC Hello"], " "))
+    Mailbox.send_mail(pid, {self(), "says SYNC hello"})
     IO.puts("sent sync message to server...")
     IO.puts("sending async message to server...")
-    Mailbox.async_send_mail(pid, Enum.join(["Test", "says Async Hello"], " "))
+    Mailbox.async_send_mail(pid, {self(), "says ASYNC hello"})
     IO.puts("sent async message to server...")
   end
 end
